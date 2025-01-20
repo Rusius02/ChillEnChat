@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat en temps réel</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        #login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        #login input { padding: 10px; margin: 10px 0; font-size: 16px; }
-        #chat { display: none; }
-        #messages { list-style-type: none; padding: 0; margin: 0; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+        #users { background: #f3f3f3; padding: 10px; border-right: 1px solid #ddd; }
+        #chat-container { display: flex; flex: 1; }
+        #messages { list-style-type: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
         #messages li { padding: 8px; border-bottom: 1px solid #ddd; }
         #form { display: flex; margin-top: 10px; }
         #input { flex: 1; padding: 10px; }
         #send { padding: 10px; }
+        #user-list { margin: 0; padding: 0; list-style-type: none; }
     </style>
 </head>
 <body>
@@ -23,12 +23,20 @@
         <button id="startChat">Rejoindre le chat</button>
     </div>
 
-    <div id="chat">
-        <ul id="messages"></ul>
-        <form id="form" action="">
-            <input id="input" autocomplete="off" placeholder="Écris un message..." />
-            <button id="send">Envoyer</button>
-        </form>
+    <div id="chat" style="display: none;">
+        <div id="chat-container">
+            <div id="users">
+                <h3>Utilisateurs connectés</h3>
+                <ul id="user-list"></ul>
+            </div>
+            <div>
+                <ul id="messages"></ul>
+                <form id="form" action="">
+                    <input id="input" autocomplete="off" placeholder="Écris un message..." />
+                    <button id="send">Envoyer</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -42,6 +50,7 @@
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const messages = document.getElementById('messages');
+        const userList = document.getElementById('user-list');
 
         // Gérer la connexion de l'utilisateur
         startChatButton.addEventListener('click', () => {
@@ -71,7 +80,17 @@
             const item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        // Mise à jour de la liste des utilisateurs connectés
+        socket.on('update user list', (users) => {
+            userList.innerHTML = ''; // Efface la liste existante
+            users.forEach((user) => {
+                const item = document.createElement('li');
+                item.textContent = user;
+                userList.appendChild(item);
+            });
         });
     </script>
 </body>
