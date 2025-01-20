@@ -6,21 +6,27 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Servir les fichiers statiques (frontend)
-app.use(express.static('public'));
+app.use(express.static('public')); // Servir les fichiers statiques
 
 // Gestion des connexions WebSocket
 io.on('connection', (socket) => {
-    console.log('Un utilisateur s\'est connecté');
+    console.log('Un utilisateur s\'est connecté.');
 
-    // Réception d'un message du client
+    // Stocker le pseudo de l'utilisateur
+    socket.on('set username', (username) => {
+        socket.username = username; // Stocke le pseudo dans le contexte du socket
+        console.log(`Pseudo défini : ${username}`);
+        socket.emit('username set', username); // Confirmation au client
+    });
+
+    // Réception d'un message
     socket.on('chat message', (msg) => {
-        // Réémet le message à tous les clients connectés
-        io.emit('chat message', msg);
+        const fullMessage = `${socket.username || 'Anonyme'}: ${msg}`;
+        io.emit('chat message', fullMessage); // Réémet le message à tous
     });
 
     socket.on('disconnect', () => {
-        console.log('Un utilisateur s\'est déconnecté');
+        console.log(`${socket.username || 'Un utilisateur'} s'est déconnecté.`);
     });
 });
 
