@@ -1,0 +1,143 @@
+/* Appliquer à l'ensemble du body pour centrer verticalement et horizontalement */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #111;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('background_bar.png')no-repeat center center fixed; 
+    background-size: cover; /* Ajuste l'image pour couvrir tout l'écran sans déformation */
+    background-position: center; 
+}
+
+/* Bloc de login et chat centré avec effet néon */
+#login, #chat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+    background-color: rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Applique l'effet néon sur le texte du titre */
+h2 {
+    color: #00ffff;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff;
+}
+
+/* Input et bouton avec effet néon */
+input, button {
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #00ffff;
+    border-radius: 4px;
+    background-color: transparent;
+    color: #00ffff;
+    transition: all 0.3s ease-in-out;
+}
+
+input::placeholder, button::before {
+    color: #00ffff;
+}
+
+/* Effet néon pour les éléments au focus ou au survol */
+input:focus, button:hover {
+    border-color: #ff00ff;
+    box-shadow: 0 0 8px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+    outline: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Styliser le chat */
+#chat-container {
+    width: 400px;
+    max-width: 100%;
+}
+
+/* Messages du chat avec effet néon */
+#messages {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #222;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    color: #00ffff;
+}
+
+#messages li {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+}
+
+/* Style de la zone d'entrée de message */
+#form {
+    display: flex;
+}
+
+#input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #00ffff;
+    border-radius: 4px;
+    background-color: #111;
+    color: white;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease-in-out;
+}
+
+#send {
+    padding: 10px 20px;
+    margin-left: 10px;
+    background-color: #00ffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+}
+
+#send:hover {
+    background-color: #ff00ff;
+    box-shadow: 0 0 8px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+}
+
+/* Liste des utilisateurs */
+#users {
+    margin-bottom: 20px;
+}
+
+#user-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#user-list li {
+    margin: 5px 0;
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+}
+
+#user-list .active {
+    color: #00ff00; /* Vert pour les utilisateurs actifs */
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+}
+
+#user-list .inactive {
+    color: #777; /* Gris pour les utilisateurs inactifs */
+}

@@ -3,36 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat en temps réel</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
-        #users { background: #f3f3f3; padding: 10px; border-right: 1px solid #ddd; }
-        #chat-container { display: flex; flex: 1; }
-        #messages { list-style-type: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
-        #messages li { padding: 8px; border-bottom: 1px solid #ddd; }
-        #form { display: flex; margin-top: 10px; }
-        #input { flex: 1; padding: 10px; }
-        #send { padding: 10px; }
-        #user-list { margin: 0; padding: 0; list-style-type: none; }
-        .user { display: flex; align-items: center; margin: 5px 0; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
-        .active { background: green; }
-        .inactive { background: gray; }
-    </style>
+    <title>Chat Néon Futuriste</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div id="login">
-        <h2>Bienvenue dans le chat</h2>
+        <h2>Bienvenue dans le chat néon</h2>
         <input id="username" type="text" placeholder="Entrez votre pseudo" />
         <button id="startChat">Rejoindre le chat</button>
     </div>
 
     <div id="chat" style="display: none;">
         <div id="chat-container">
+            <!-- Liste des utilisateurs connectés -->
             <div id="users">
                 <h3>Utilisateurs connectés</h3>
                 <ul id="user-list"></ul>
             </div>
+
             <div>
                 <ul id="messages"></ul>
                 <form id="form" action="">
@@ -41,71 +29,84 @@
                 </form>
             </div>
         </div>
+        
+        <!-- Décor du bar futuriste -->
+        <div id="bar">
+            <!-- Le comptoir du bar avec un effet néon -->
+            <div id="panels"></div> <!-- Panneau lumineux futuriste -->
+            
+            <!-- Étagères de boissons avec des néons -->
+            <div id="shelves">
+                <div class="shelf"></div>
+                <div class="shelf"></div>
+                <div class="shelf"></div>
+            </div>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
 
-        const loginDiv = document.getElementById('login');
-        const chatDiv = document.getElementById('chat');
-        const usernameInput = document.getElementById('username');
-        const startChatButton = document.getElementById('startChat');
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-        const messages = document.getElementById('messages');
-        const userList = document.getElementById('user-list');
+    const loginDiv = document.getElementById('login');
+    const chatDiv = document.getElementById('chat');
+    const usernameInput = document.getElementById('username');
+    const startChatButton = document.getElementById('startChat');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+    const userList = document.getElementById('user-list');
 
-        let typingTimeout;
+    let typingTimeout;
 
-        // Gérer la connexion de l'utilisateur
-        startChatButton.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                socket.emit('set username', username);
-            }
-        });
+    // Gérer la connexion de l'utilisateur
+    startChatButton.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        if (username) {
+            socket.emit('set username', username);
+        }
+    });
 
-        // Confirmation du pseudo côté serveur
-        socket.on('username set', (username) => {
-            alert(`Bienvenue ${username} !`);
-            loginDiv.style.display = 'none';
-            chatDiv.style.display = 'block';
-        });
+    // Confirmation du pseudo côté serveur
+    socket.on('username set', (username) => {
+        alert(`Bienvenue ${username} !`);
+        loginDiv.style.display = 'none';
+        chatDiv.style.display = 'block';
+    });
 
-        // Gestion des messages
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
-            }
-        });
+    // Gestion des messages
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value) {
+            socket.emit('chat message', input.value);
+            input.value = '';
+        }
+    });
 
-        input.addEventListener('input', () => {
-            socket.emit('user active');
-        });
+    input.addEventListener('input', () => {
+        socket.emit('user active');
+    });
 
-        socket.on('chat message', (msg) => {
+    socket.on('chat message', (msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+    });
+
+    // Mise à jour de la liste des utilisateurs connectés
+    socket.on('update user list', (users) => {
+        userList.innerHTML = ''; // Efface la liste existante
+        for (const [username, user] of Object.entries(users)) {
             const item = document.createElement('li');
-            item.textContent = msg;
-            messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight;
-        });
-
-        // Mise à jour de la liste des utilisateurs connectés
-        socket.on('update user list', (users) => {
-            userList.innerHTML = ''; // Efface la liste existante
-            for (const [username, user] of Object.entries(users)) {
-                const item = document.createElement('li');
-                item.className = 'user';
-                const statusDot = document.createElement('span');
-                statusDot.className = `status-dot ${user.active ? 'active' : 'inactive'}`;
-                item.appendChild(statusDot);
-                item.appendChild(document.createTextNode(username));
-                userList.appendChild(item);
-            }
-        });
+            item.className = 'user';
+            const statusDot = document.createElement('span');
+            statusDot.className = `status-dot ${user.active ? 'active' : 'inactive'}`;
+            item.appendChild(statusDot);
+            item.appendChild(document.createTextNode(username));
+            userList.appendChild(item);
+        }
+    });
     </script>
 </body>
 </html>
