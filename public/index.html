@@ -14,6 +14,10 @@
         #input { flex: 1; padding: 10px; }
         #send { padding: 10px; }
         #user-list { margin: 0; padding: 0; list-style-type: none; }
+        .user { display: flex; align-items: center; margin: 5px 0; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
+        .active { background: green; }
+        .inactive { background: gray; }
     </style>
 </head>
 <body>
@@ -52,6 +56,8 @@
         const messages = document.getElementById('messages');
         const userList = document.getElementById('user-list');
 
+        let typingTimeout;
+
         // Gérer la connexion de l'utilisateur
         startChatButton.addEventListener('click', () => {
             const username = usernameInput.value.trim();
@@ -76,6 +82,10 @@
             }
         });
 
+        input.addEventListener('input', () => {
+            socket.emit('user active');
+        });
+
         socket.on('chat message', (msg) => {
             const item = document.createElement('li');
             item.textContent = msg;
@@ -86,11 +96,15 @@
         // Mise à jour de la liste des utilisateurs connectés
         socket.on('update user list', (users) => {
             userList.innerHTML = ''; // Efface la liste existante
-            users.forEach((user) => {
+            for (const [username, user] of Object.entries(users)) {
                 const item = document.createElement('li');
-                item.textContent = user;
+                item.className = 'user';
+                const statusDot = document.createElement('span');
+                statusDot.className = `status-dot ${user.active ? 'active' : 'inactive'}`;
+                item.appendChild(statusDot);
+                item.appendChild(document.createTextNode(username));
                 userList.appendChild(item);
-            });
+            }
         });
     </script>
 </body>

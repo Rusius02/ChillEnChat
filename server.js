@@ -6,35 +6,46 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static('public')); // Servir les fichiers statiques
+app.use(express.static('public'));
 
-// Liste des utilisateurs connectés
-let connectedUsers = [];
+let connectedUsers = {}; // Stocker les utilisateurs avec leur état
 
 io.on('connection', (socket) => {
     console.log('Un utilisateur s\'est connecté.');
 
-    // Stocker le pseudo de l'utilisateur
     socket.on('set username', (username) => {
         socket.username = username;
-        connectedUsers.push(username); // Ajouter l'utilisateur à la liste
+        connectedUsers[username] = { active: true }; // Ajouter avec état "actif"
         console.log(`Utilisateur connecté : ${username}`);
-        io.emit('update user list', connectedUsers); // Mettre à jour la liste des utilisateurs
+        io.emit('update user list', connectedUsers);
         socket.emit('username set', username);
     });
 
-    // Réception d'un message
+    // Marquer l'utilisateur comme actif lorsqu'il tape
+    socket.on('user active', () => {
+        if (socket.username) {
+            connectedUsers[socket.username].active = true;
+            io.emit('update user list', connectedUsers);
+            // Planifier un passage à l'état "inactif" après 10 secondes
+            clearTimeout(socket.activityTimeout);
+            socket.activityTimeout = setTimeout(() => {
+                if (connectedUsers[socket.username]) {
+                    connectedUsers[socket.username].active = false;
+                    io.emit('update user list', connectedUsers);
+                }
+            }, 10000); // 10 secondes d'inactivité
+        }
+    });
     socket.on('chat message', (msg) => {
         const fullMessage = `${socket.username || 'Anonyme'}: ${msg}`;
         io.emit('chat message', fullMessage);
     });
-
-    // Déconnexion d'un utilisateur
+    // Déconnexion de l'utilisateur
     socket.on('disconnect', () => {
         if (socket.username) {
             console.log(`Utilisateur déconnecté : ${socket.username}`);
-            connectedUsers = connectedUsers.filter((user) => user !== socket.username);
-            io.emit('update user list', connectedUsers); // Mettre à jour la liste des utilisateurs
+            delete connectedUsers[socket.username]; // Retirer de la liste
+            io.emit('update user list', connectedUsers);
         }
     });
 });
